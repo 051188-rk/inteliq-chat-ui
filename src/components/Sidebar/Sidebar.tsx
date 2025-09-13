@@ -54,10 +54,26 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
 
       <Box className="sidebar-section nav-section">
         <List className="nav-list">
-          <ListItem button className="nav-item active"><ChatIcon /><Typography>Home</Typography><span>⌘H</span></ListItem>
-          <ListItem button className="nav-item"><LibraryIcon /><Typography>Library</Typography><span>⌘T</span></ListItem>
-          <ListItem button className="nav-item"><HistoryIcon /><Typography>History</Typography><span>⌘G</span></ListItem>
-          <ListItem button className="nav-item"><ExploreIcon /><Typography>Explore</Typography><span>⌘L</span></ListItem>
+          <ListItem button className="nav-item active">
+            <ChatIcon active />
+            <Typography>Home</Typography>
+            <span>⌘H</span>
+          </ListItem>
+          <ListItem button className="nav-item">
+            <LibraryIcon />
+            <Typography>Library</Typography>
+            <span>⌘T</span>
+          </ListItem>
+          <ListItem button className="nav-item">
+            <HistoryIcon />
+            <Typography>History</Typography>
+            <span>⌘G</span>
+          </ListItem>
+          <ListItem button className="nav-item">
+            <ExploreIcon />
+            <Typography>Explore</Typography>
+            <span>⌘L</span>
+          </ListItem>
         </List>
       </Box>
 
