@@ -14,8 +14,13 @@ export async function sendChatMessage(messages: Array<{role: string; content: st
       });
   
       const chatCompletion = await groq.chat.completions.create({
-        model: 'mixtral-8x7b-32768',
-        messages,
+        model: 'openai/gpt-oss-20b',
+        messages: [
+            {
+              "role": "user",
+              "content": ""
+            }
+          ],
         temperature: 1,
         max_tokens: 8192,
         top_p: 1,
