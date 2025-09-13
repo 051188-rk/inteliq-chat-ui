@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import Header from './components/Header/Header';
@@ -8,10 +8,19 @@ import QuickActions from './components/QuickActions/QuickActions';
 import ChatWindow from './components/ChatWindow/ChatWindow';
 import ChatInput from './components/ChatInput/ChatInput';
 import { Message, Chat, FileAttachment } from './types';
-import { sendChatMessage } from './utils/groqClient';
 import theme from './theme';
 import './App.css';
 import img from './assets/hand.png';
+
+// A mock function to simulate sending a message
+const sendChatMessage = async (messages: { role: string; content: string }[]): Promise<string> => {
+  console.log("Sending messages:", messages);
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("This is a simulated response from the AI.");
+    }, 1000);
+  });
+};
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,111 +28,93 @@ function App() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const generateChatId = () => Math.random().toString(36).substr(2, 9);
-  const generateMessageId = () => Math.random().toString(36).substr(2, 9);
-
-  const createNewChat = () => {
-    const newChat: Chat = {
-      id: generateChatId(),
-      title: 'New Chat',
-      messages: [],
-      timestamp: new Date()
-    };
-    setCurrentChat(newChat);
-    setChats(prev => [newChat, ...prev]);
-  };
+  const generateId = () => Math.random().toString(36).substr(2, 9);
 
   const updateChatTitle = (chatId: string, firstMessage: string) => {
-    const title = firstMessage.length > 50 
-      ? firstMessage.substring(0, 50) + '...' 
+    const title = firstMessage.length > 30 
+      ? firstMessage.substring(0, 30) + '...' 
       : firstMessage;
     
     setChats(prev => prev.map(chat => 
-      chat.id === chatId 
-        ? { ...chat, title, lastMessage: firstMessage }
-        : chat
+      chat.id === chatId ? { ...chat, title } : chat
     ));
     
     if (currentChat?.id === chatId) {
-      setCurrentChat(prev => prev ? { ...prev, title, lastMessage: firstMessage } : null);
+      setCurrentChat(prev => prev ? { ...prev, title } : null);
     }
   };
 
   const handleSendMessage = async (content: string, attachments: FileAttachment[]) => {
     if (!content.trim() && attachments.length === 0) return;
 
-    let chat = currentChat;
-    if (!chat) {
-      chat = {
-        id: generateChatId(),
+    let activeChat = currentChat;
+    
+    // Create a new chat if one doesn't exist
+    if (!activeChat) {
+      activeChat = {
+        id: generateId(),
         title: 'New Chat',
         messages: [],
         timestamp: new Date()
       };
-      setCurrentChat(chat);
-      setChats(prev => [chat!, ...prev]);
-    }
-
-    let messageContent = content;
-    if (attachments.length > 0) {
-      const fileList = attachments.map(att => `[File: ${att.name}]`).join(' ');
-      messageContent = content ? `${content}\n\n${fileList}` : fileList;
+      setChats(prev => [activeChat!, ...prev]);
+      setCurrentChat(activeChat);
     }
 
     const userMessage: Message = {
-      id: generateMessageId(),
-      content: messageContent,
+      id: generateId(),
+      content: content,
       role: 'user',
       timestamp: new Date()
     };
-
-    const updatedMessages = [...chat.messages, userMessage];
     
-    const updatedChat = { ...chat, messages: updatedMessages };
+    // Update the UI immediately with the user's message
+    const updatedMessages = [...activeChat.messages, userMessage];
+    const updatedChat = { ...activeChat, messages: updatedMessages };
+    
     setCurrentChat(updatedChat);
-    setChats(prev => prev.map(c => c.id === chat!.id ? updatedChat : c));
+    setChats(prev => prev.map(c => c.id === activeChat!.id ? updatedChat : c));
 
-    if (chat.messages.length === 0) {
-      updateChatTitle(chat.id, content || 'File upload');
+    // If this is the first message, update the chat title
+    if (activeChat.messages.length === 0) {
+      updateChatTitle(activeChat.id, content);
     }
 
     setIsLoading(true);
     try {
-      const chatMessages = updatedMessages.map(msg => ({
+      const chatHistory = updatedMessages.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
 
-      const response = await sendChatMessage(chatMessages);
+      const response = await sendChatMessage(chatHistory);
       
       const assistantMessage: Message = {
-        id: generateMessageId(),
+        id: generateId(),
         content: response,
         role: 'assistant',
         timestamp: new Date()
       };
-
+      
+      // Add the assistant's response
       const finalMessages = [...updatedMessages, assistantMessage];
       const finalChat = { ...updatedChat, messages: finalMessages };
       
       setCurrentChat(finalChat);
-      setChats(prev => prev.map(c => c.id === chat!.id ? finalChat : c));
+      setChats(prev => prev.map(c => c.id === activeChat!.id ? finalChat : c));
       
     } catch (error) {
       console.error('Error getting AI response:', error);
-      
       const errorMessage: Message = {
-        id: generateMessageId(),
-        content: 'Sorry, I encountered an error while processing your request.',
+        id: generateId(),
+        content: 'Sorry, I encountered an error. Please try again.',
         role: 'assistant',
         timestamp: new Date()
       };
-
       const errorMessages = [...updatedMessages, errorMessage];
       const errorChat = { ...updatedChat, messages: errorMessages };
-      
       setCurrentChat(errorChat);
-      setChats(prev => prev.map(c => c.id === chat!.id ? errorChat : c));
+      setChats(prev => prev.map(c => c.id === activeChat!.id ? errorChat : c));
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +129,7 @@ function App() {
   };
 
   const handleNewChat = () => {
-    createNewChat();
+    setCurrentChat(null); // This will show the welcome screen
   };
 
   const toggleSidebar = () => {
@@ -151,24 +142,25 @@ function App() {
       <Box className="app">
         <Sidebar
           open={sidebarOpen}
+          onToggle={toggleSidebar}
           chats={chats}
           onSelectChat={handleSelectChat}
           currentChatId={currentChat?.id}
         />
         
-        <Box className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+        <Box className={`main-content ${sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
           <Header
             onToggleSidebar={toggleSidebar}
             onNewChat={handleNewChat}
-            currentModel="ChatGPT 4"
+            currentModel="Intelliq 1.0"
           />
           
           <Box className="chat-area">
-            {!currentChat || currentChat.messages.length === 0 ? (
+            {!currentChat ? (
               <Box className="welcome-screen">
                 <Box className="welcome-content">
                   <Box className="greeting-container">
-                    <img src={img} alt="hand" className="hand-emoji" />
+                    <img src={img} alt="Waving hand emoji" className="hand-emoji" />
                     <h1 className="greeting-text">Hi Laurence!</h1>
                   </Box>
                   <h2 className="welcome-question">
