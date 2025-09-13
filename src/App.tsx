@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
@@ -10,6 +11,7 @@ import { Message, Chat, FileAttachment } from './types';
 import { sendChatMessage } from './utils/groqClient';
 import theme from './theme';
 import './App.css';
+import img from './assets/hand.png';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -50,7 +52,6 @@ function App() {
   const handleSendMessage = async (content: string, attachments: FileAttachment[]) => {
     if (!content.trim() && attachments.length === 0) return;
 
-    // Create or use current chat
     let chat = currentChat;
     if (!chat) {
       chat = {
@@ -63,14 +64,12 @@ function App() {
       setChats(prev => [chat!, ...prev]);
     }
 
-    // Prepare message content
     let messageContent = content;
     if (attachments.length > 0) {
       const fileList = attachments.map(att => `[File: ${att.name}]`).join(' ');
       messageContent = content ? `${content}\n\n${fileList}` : fileList;
     }
 
-    // Add user message
     const userMessage: Message = {
       id: generateMessageId(),
       content: messageContent,
@@ -80,17 +79,14 @@ function App() {
 
     const updatedMessages = [...chat.messages, userMessage];
     
-    // Update chat with user message
     const updatedChat = { ...chat, messages: updatedMessages };
     setCurrentChat(updatedChat);
     setChats(prev => prev.map(c => c.id === chat!.id ? updatedChat : c));
 
-    // Update title if this is the first message
     if (chat.messages.length === 0) {
       updateChatTitle(chat.id, content || 'File upload');
     }
 
-    // Get AI response
     setIsLoading(true);
     try {
       const chatMessages = updatedMessages.map(msg => ({
@@ -171,11 +167,13 @@ function App() {
             {!currentChat || currentChat.messages.length === 0 ? (
               <Box className="welcome-screen">
                 <Box className="welcome-content">
-                  <Box className="greeting">
-                    <span className="wave-emoji">👋</span>
+                  <Box className="greeting-container">
+                    <img src={img} alt="hand" className="hand-emoji" />
                     <h1 className="greeting-text">Hi Laurence!</h1>
                   </Box>
-                  <h2 className="welcome-question">What do you want to learn today?</h2>
+                  <h2 className="welcome-question">
+                    What do you want to<br />learn today?
+                  </h2>
                   <QuickActions onSelectAction={handleQuickAction} />
                 </Box>
               </Box>

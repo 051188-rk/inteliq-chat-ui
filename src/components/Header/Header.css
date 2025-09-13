@@ -27,14 +27,19 @@
   
   .model-selector {
     background: #f8f9fa;
-    padding: 6px 12px;
+    padding: 4px 12px 4px 8px;
     border-radius: 20px;
     border: 1px solid #e8eaed;
+    display: flex;
+    align-items: center;
+    height: 32px;
   }
   
   .model-text {
     color: #5f6368 !important;
     font-size: 13px !important;
+    font-weight: 500;
+    line-height: 1;
   }
   
   .header-right {

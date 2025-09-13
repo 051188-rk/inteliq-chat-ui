@@ -1,64 +1,79 @@
+/* src/components/QuickActions/QuickActions.css */
 .quick-actions-container {
     display: flex;
-    gap: 16px;
-    padding: 0 24px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+    margin-top: 48px;
+    flex-wrap: nowrap;
   }
-  
+    
   .quick-action-card {
     flex: 1;
-    min-width: 280px;
-    max-width: 400px;
+    min-width: 200px;
+    height: 180px;
     cursor: pointer !important;
-    border: 1px solid #e8eaed !important;
-    border-radius: 12px !important;
+    border-radius: 16px !important;
     box-shadow: none !important;
     transition: all 0.2s ease-in-out !important;
-  }
-  
-  .quick-action-card:hover {
-    border-color: #4285f4 !important;
-    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.1) !important;
-    transform: translateY(-1px);
-  }
-  
-  .quick-action-content {
+    background: linear-gradient(145deg, #f3f6ff, #ffffff) !important;
+    border: 1px solid #e8eaed !important;
+    position: relative !important;
     padding: 16px !important;
+    overflow: hidden !important;
+  }
+    
+  .quick-action-card.active {
+    border-color: #8ab4f8 !important;
+    box-shadow: 0 4px 20px rgba(66, 133, 244, 0.2) !important;
+    transform: translateY(-2px);
+  }
+    
+  .quick-action-content {
+    padding: 0 !important;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
   }
-  
+    
   .action-icon {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #f8f9fa;
+    background: #e8f0fe;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #4285f4;
+    transition: all 0.2s ease-in-out;
   }
   
+  .action-icon.active {
+    background: #4285f4;
+    color: #ffffff;
+  }
+    
   .action-text {
-    color: #202124 !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    font-weight: 400 !important;
+    color: #3c4043 !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+    margin-top: auto;
   }
-  
-  @media (max-width: 768px) {
+    
+  @media (max-width: 900px) {
     .quick-actions-container {
       flex-direction: column;
-      padding: 0 16px;
+      padding: 0;
+      gap: 16px;
     }
     
     .quick-action-card {
       min-width: auto;
       max-width: none;
+      height: auto;
+      min-height: 120px;
     }
   }
-  

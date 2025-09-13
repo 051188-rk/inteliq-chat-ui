@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { Box, Typography, Avatar, Paper } from '@mui/material';
 import { Message } from '../../types';
+import userAvatar from '../../assets/user.jpg';
+import aiAvatar from '../../assets/ai.png';
 import './ChatWindow.css';
 
 interface ChatWindowProps {
@@ -38,14 +40,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading }) => {
             <Box className="message-content">
               <Avatar 
                 className={`message-avatar ${message.role}-avatar`}
+                src={message.role === 'user' ? userAvatar : aiAvatar}
                 sx={{ 
-                  bgcolor: message.role === 'user' ? '#4285f4' : '#34a853',
-                  width: 32,
-                  height: 32
+                  width: 40,
+                  height: 40,
+                  border: '1px solid #e0e0e0'
                 }}
-              >
-                {message.role === 'user' ? 'You' : 'AI'}
-              </Avatar>
+              />
               <Paper className="message-bubble" elevation={0}>
                 <Typography 
                   variant="body1" 
@@ -65,12 +66,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading }) => {
         {isLoading && (
           <Box className="message-wrapper assistant-message">
             <Box className="message-content">
-              <Avatar 
-                className="message-avatar assistant-avatar"
-                sx={{ bgcolor: '#34a853', width: 32, height: 32 }}
-              >
-                AI
-              </Avatar>
+              <Box 
+                className="skeleton-avatar"
+                sx={{ 
+                  width: 40,
+                  height: 40,
+                  flexShrink: 0
+                }}
+              />
               <Paper className="message-bubble typing-indicator" elevation={0}>
                 <Box className="typing-dots">
                   <span></span>

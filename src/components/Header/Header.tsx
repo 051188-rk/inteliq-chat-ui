@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, IconButton, Typography, Button } from '@mui/material';
+import { Box, IconButton, Typography, Button, Avatar } from '@mui/material';
+import openAILogo from '../../assets/openai.png';
 import MenuIcon from '@mui/icons-material/Menu';
 import ShareIcon from '@mui/icons-material/Share';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -18,10 +19,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onNewChat, currentMode
         <IconButton onClick={onToggleSidebar} className="menu-button">
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" className="app-title">
-          Intelliq
-        </Typography>
         <Box className="model-selector">
+          <Avatar 
+            src={openAILogo} 
+            sx={{ 
+              width: 20, 
+              height: 20, 
+              marginRight: 1,
+              '& img': {
+                objectFit: 'contain'
+              }
+            }} 
+          />
           <Typography variant="body2" className="model-text">
             {currentModel}
           </Typography>
