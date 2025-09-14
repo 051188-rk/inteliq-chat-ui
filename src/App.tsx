@@ -150,9 +150,8 @@ function App() {
         
         <Box className={`main-content ${sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
           <Header
-            onToggleSidebar={toggleSidebar}
             onNewChat={handleNewChat}
-            currentModel="Intelliq 1.0"
+            currentModel="ChatGPT 4"
           />
           
           <Box className="chat-area">

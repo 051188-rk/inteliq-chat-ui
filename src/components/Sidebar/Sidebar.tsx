@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, IconButton, TextField, List, ListItem, ListItemText, Button, Avatar, InputAdornment } from '@mui/material';
 import { Chat } from '../../types';
 import './Sidebar.css';
@@ -30,9 +30,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
           <Avatar className="logo-avatar"><IntelliqLogo /></Avatar>
           <Typography className="logo-text">Inteliq</Typography>
         </Box>
-        <IconButton className="collapse-button" size="small" onClick={onToggle}>
-          <CollapseIcon />
-        </IconButton>
       </Box>
 
       <Box className="sidebar-section">
@@ -127,6 +124,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
 
   return (
     <Box className={`sidebar-container ${open ? 'expanded' : 'collapsed'}`}>
+      <IconButton className={`sidebar-toggle ${!open ? 'collapsed' : ''}`} size="small" onClick={onToggle}>
+        <CollapseIcon />
+      </IconButton>
       {open ? <ExpandedView /> : <CollapsedView />}
     </Box>
   );

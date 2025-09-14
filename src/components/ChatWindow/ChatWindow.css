@@ -34,14 +34,15 @@
     justify-content: flex-start;
   }
   
-  .message-content {
+  /* src/components/ChatWindow/ChatWindow.css */
+.message-content {
     display: flex;
     align-items: flex-start;
     gap: 16px;
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0; /* Changed from padding: 0 1.5rem; */
     box-sizing: border-box;
   }
   
