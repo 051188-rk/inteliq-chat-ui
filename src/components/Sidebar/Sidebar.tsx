@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, IconButton, TextField, List, ListItem, ListItemText, Button, Avatar, InputAdornment } from '@mui/material';
 import { Chat } from '../../types';
 import './Sidebar.css';
@@ -21,9 +21,31 @@ const dummyChats: Chat[] = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, currentChatId }) => {
-  const allChats = [...chats, ...dummyChats];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
+  const [allChats] = useState<Chat[]>([...chats, ...dummyChats]);
 
-  const ExpandedView = () => (
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredChats(allChats);
+    } else {
+      const filtered = allChats.filter(chat =>
+        chat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        chat.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredChats(filtered);
+    }
+  }, [searchQuery, allChats]);
+
+  const truncateText = (text: string, maxLength: number = 40) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const ExpandedView = React.memo(() => (
     <Box className="sidebar-content">
       <Box className="sidebar-header">
         <Box className="logo-section">
@@ -38,6 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
           variant="outlined"
           placeholder="Search for chats..."
           size="small"
+          value={searchQuery}
+          onChange={handleSearchChange}
           className="search-input"
           InputProps={{
             startAdornment: (
@@ -77,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
       <Box className="sidebar-section chats-section">
         <Typography className="section-title">Recent Chats</Typography>
         <List className="chat-list">
-          {allChats.slice(0, 5).map((chat) => (
+          {filteredChats.slice(0, 5).map((chat) => (
             <ListItem button key={chat.id} onClick={() => onSelectChat(chat)} className={`chat-item ${currentChatId === chat.id ? 'active' : ''}`}>
               <ListItemText primary={chat.title} />
             </ListItem>
@@ -103,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
         </Box>
       </Box>
     </Box>
-  );
+  ));
 
   const CollapsedView = () => (
     <Box className="sidebar-content-collapsed">
@@ -124,7 +148,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
 
   return (
     <Box className={`sidebar-container ${open ? 'expanded' : 'collapsed'}`}>
-      <IconButton className={`sidebar-toggle ${!open ? 'collapsed' : ''}`} size="small" onClick={onToggle}>
+      <IconButton 
+        className={`sidebar-toggle ${!open ? 'collapsed' : ''}`} 
+        size="small" 
+        onClick={onToggle}
+        onMouseDown={(e) => e.preventDefault()}
+      >
         <CollapseIcon />
       </IconButton>
       {open ? <ExpandedView /> : <CollapsedView />}
@@ -132,4 +161,4 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onToggle, chats, onSelectChat, 
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);
